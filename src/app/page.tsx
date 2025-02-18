@@ -1,6 +1,5 @@
 import Image from "next/image";
 
-import Navbar from '@/app/components/Navbar';
 import Stats from '@/app/components/Stats';
 import Attendance from '@/app/components/Attendance';
 import Calendar from '@/app/components/Calendar';
@@ -9,7 +8,6 @@ import AddToCalendar from '@/app/components/AddToCalendar';
 export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
       <div className="container mx-auto p-4 sm:p-6">
         <h1 className="text-xl font-semibold mb-4 sm:mb-6">Dashboard</h1>
         <div className="text-sm text-gray-500 mb-4 sm:mb-6">Wszystkie niezbędne informacje na jednym ekranie</div>

@@ -44,34 +44,30 @@ export default function Attendance() {
   };
 
   return (
-    <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm">
-      <h1 className="text-lg font-semibold mb-4">Aktualne zajęcia</h1>
-      
-      <div className="mb-4 sm:mb-6">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2">
-          <h2 className="text-lg font-semibold mb-2 sm:mb-0">{currentClass.title}</h2>
-          <div className="text-base">
+    <div className="bg-white p-3 rounded-lg shadow-sm">
+      <div className="mb-3">
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-base font-semibold">{currentClass.title}</h2>
+          <div className="text-sm">
             <span className="font-semibold">10:00 - 12:00</span>
             <span className="text-gray-500 ml-2">(43min.)</span>
           </div>
         </div>
-        <div className="text-blue-600 mb-4 sm:mb-6">{currentClass.trainer}</div>
+        <div className="text-blue-600 text-sm">{currentClass.trainer}</div>
         
-        <div className="mb-2">
-          <span className="text-base font-semibold">14 uczestników</span>
-        </div>
-        <div className="text-sm text-gray-500 mb-4 sm:mb-6">
-          Proszę odznaczać obecność uczestników na aktualnych zajęciach.
+        <div className="flex items-center justify-between mt-2">
+          <span className="text-sm font-semibold">14 uczestników</span>
+          <span className="text-xs text-gray-500">Proszę odznaczać obecność</span>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 gap-2 overflow-y-auto max-h-[400px] pr-1">
         {participants.map((participant, index) => (
           <div
             key={index}
             onClick={() => handleAttendanceChange(index)}
             className={`
-              flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all
+              flex items-center gap-2 p-1.5 rounded-lg cursor-pointer transition-all min-h-[36px]
               ${participant.isPresent 
                 ? 'bg-blue-500 text-white' 
                 : 'bg-white border border-gray-200 hover:bg-gray-50'
@@ -79,14 +75,14 @@ export default function Attendance() {
             `}
           >
             <div className={`
-              flex items-center justify-center w-5 h-5 rounded border
+              flex items-center justify-center w-4 h-4 rounded border
               ${participant.isPresent 
                 ? 'border-white' 
                 : 'border-gray-300'
               }
             `}>
               {participant.isPresent && (
-                <svg className="w-3 h-3 text-white" viewBox="0 0 20 20" fill="currentColor">
+                <svg className="w-2.5 h-2.5 text-white" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
               )}

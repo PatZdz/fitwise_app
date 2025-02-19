@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import { pl } from 'date-fns/locale';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -39,13 +39,7 @@ const colorMap = {
   Czerwony: 'bg-red-600'
 };
 
-// Add these state declarations at the beginning of the component
 export default function AddToCalendar() {
-  const [showTimeStartPicker, setShowTimeStartPicker] = useState(false);
-  const [showTimeEndPicker, setShowTimeEndPicker] = useState(false);
-  const timeStartRef = useRef<HTMLDivElement>(null);
-  const timeEndRef = useRef<HTMLDivElement>(null);
-
   const [formData, setFormData] = useState<FormData>({
     name: 'Trening personalny',
     type: 'Indywidualne',
@@ -253,92 +247,110 @@ export default function AddToCalendar() {
           <div className="grid grid-cols-2 gap-2">
             <div>
               <label className="block text-sm text-gray-600 mb-0.5">Od</label>
-              <div className="relative" ref={timeStartRef}>
+              <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
                   {icons.time}
                 </div>
-                <input
-                  type="text"
+                <select 
                   name="timeStart"
                   value={formData.timeStart}
-                  onChange={(e) => handleTimeChange(e, 'timeStart')}
-                  placeholder="HH:mm"
-                  className="w-full h-9 pl-9 pr-8 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowTimeStartPicker(!showTimeStartPicker)}
-                  className="absolute inset-y-0 right-0 flex items-center px-2"
+                  onChange={handleInputChange}
+                  className="w-full h-9 pl-9 pr-8 border border-gray-200 rounded appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
+                  <optgroup label="Rano (6:00 - 12:00)">
+                    {generateTimeOptions()
+                      .filter(time => {
+                        const hour = parseInt(time.split(':')[0]);
+                        return hour >= 6 && hour < 12;
+                      })
+                      .map(time => (
+                        <option key={time} value={time}>{time}</option>
+                      ))
+                    }
+                  </optgroup>
+                  <optgroup label="Popołudnie (12:00 - 17:00)">
+                    {generateTimeOptions()
+                      .filter(time => {
+                        const hour = parseInt(time.split(':')[0]);
+                        return hour >= 12 && hour < 17;
+                      })
+                      .map(time => (
+                        <option key={time} value={time}>{time}</option>
+                      ))
+                    }
+                  </optgroup>
+                  <optgroup label="Wieczór (17:00 - 22:00)">
+                    {generateTimeOptions()
+                      .filter(time => {
+                        const hour = parseInt(time.split(':')[0]);
+                        return hour >= 17 && hour < 22;
+                      })
+                      .map(time => (
+                        <option key={time} value={time}>{time}</option>
+                      ))
+                    }
+                  </optgroup>
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
-                </button>
-                {showTimeStartPicker && (
-                  <div className="absolute mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg z-50">
-                    <div className="max-h-60 overflow-y-auto">
-                      <div className="p-2">
-                        <div className="grid grid-cols-4 gap-1">
-                          {generateTimeOptions().map((time) => (
-                            <button
-                              key={time}
-                              onClick={() => handleTimeSelect(time, 'timeStart')}
-                              className="px-2 py-1 text-sm hover:bg-blue-50 rounded"
-                            >
-                              {time}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                </div>
               </div>
             </div>
 
             {/* Apply the same changes to the "Do" time selector */}
             <div>
               <label className="block text-sm text-gray-600 mb-0.5">Do</label>
-              <div className="relative" ref={timeEndRef}>
+              <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
                   {icons.time}
                 </div>
-                <input
-                  type="text"
+                <select 
                   name="timeEnd"
                   value={formData.timeEnd}
-                  onChange={(e) => handleTimeChange(e, 'timeEnd')}
-                  placeholder="HH:mm"
-                  className="w-full h-9 pl-9 pr-8 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowTimeEndPicker(!showTimeEndPicker)}
-                  className="absolute inset-y-0 right-0 flex items-center px-2"
+                  onChange={handleInputChange}
+                  className="w-full h-9 pl-9 pr-8 border border-gray-200 rounded appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
+                  <optgroup label="Rano (6:00 - 12:00)">
+                    {generateTimeOptions()
+                      .filter(time => {
+                        const hour = parseInt(time.split(':')[0]);
+                        return hour >= 6 && hour < 12;
+                      })
+                      .map(time => (
+                        <option key={time} value={time}>{time}</option>
+                      ))
+                    }
+                  </optgroup>
+                  <optgroup label="Popołudnie (12:00 - 17:00)">
+                    {generateTimeOptions()
+                      .filter(time => {
+                        const hour = parseInt(time.split(':')[0]);
+                        return hour >= 12 && hour < 17;
+                      })
+                      .map(time => (
+                        <option key={time} value={time}>{time}</option>
+                      ))
+                    }
+                  </optgroup>
+                  <optgroup label="Wieczór (17:00 - 22:00)">
+                    {generateTimeOptions()
+                      .filter(time => {
+                        const hour = parseInt(time.split(':')[0]);
+                        return hour >= 17 && hour < 22;
+                      })
+                      .map(time => (
+                        <option key={time} value={time}>{time}</option>
+                      ))
+                    }
+                  </optgroup>
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
-                </button>
-                {showTimeEndPicker && (
-                  <div className="absolute mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg z-50">
-                    <div className="max-h-60 overflow-y-auto">
-                      <div className="p-2">
-                        <div className="grid grid-cols-4 gap-1">
-                          {generateTimeOptions().map((time) => (
-                            <button
-                              key={time}
-                              onClick={() => handleTimeSelect(time, 'timeEnd')}
-                              className="px-2 py-1 text-sm hover:bg-blue-50 rounded"
-                            >
-                              {time}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                </div>
               </div>
             </div>
           </div>

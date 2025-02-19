@@ -1,10 +1,12 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import { pl } from 'date-fns/locale';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../styles/datepicker.css';
+
+import { PencilIcon, DocumentIcon, SwatchIcon, ClockIcon, ArrowPathIcon, BriefcaseIcon, CalendarIcon, UsersIcon } from '@heroicons/react/24/outline';
 
 interface FormData {
   name: string;
@@ -19,7 +21,31 @@ interface FormData {
   searchClient: string;
 }
 
+const icons = {
+  name: <PencilIcon className="w-5 h-5 text-gray-400" />,
+  document: <DocumentIcon className="w-5 h-5 text-gray-400" />,
+  color: <SwatchIcon className="w-5 h-5 text-gray-400" />,
+  time: <ClockIcon className="w-5 h-5 text-gray-400" />,
+  repeat: <ArrowPathIcon className="w-5 h-5 text-gray-400" />,
+  employee: <BriefcaseIcon className="w-5 h-5 text-gray-400" />,
+  calendar: <CalendarIcon className="w-5 h-5 text-gray-400" />,
+  clients: <UsersIcon className="w-5 h-5 text-gray-400" />
+};
+
+// Add color mapping (move this outside of the JSX)
+const colorMap = {
+  Zielony: 'bg-green-600',
+  Niebieski: 'bg-blue-600',
+  Czerwony: 'bg-red-600'
+};
+
+// Add these state declarations at the beginning of the component
 export default function AddToCalendar() {
+  const [showTimeStartPicker, setShowTimeStartPicker] = useState(false);
+  const [showTimeEndPicker, setShowTimeEndPicker] = useState(false);
+  const timeStartRef = useRef<HTMLDivElement>(null);
+  const timeEndRef = useRef<HTMLDivElement>(null);
+
   const [formData, setFormData] = useState<FormData>({
     name: 'Trening personalny',
     type: 'Indywidualne',
@@ -136,24 +162,32 @@ export default function AddToCalendar() {
       <div className="space-y-2">
         <div>
           <label className="block text-sm text-gray-600 mb-0.5">Nazwa zajęcia</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            className="w-full h-9 px-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+              {icons.name}
+            </div>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              className="w-full h-9 pl-9 pr-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-2">
           <div>
             <label className="block text-sm text-gray-600 mb-1">Rodzaj zajęcia</label>
             <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                {icons.document}
+              </div>
               <select 
                 name="type"
                 value={formData.type}
                 onChange={handleInputChange}
-                className="w-full h-9 px-2 border border-gray-200 rounded appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full h-9 pl-9 pr-8 border border-gray-200 rounded appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option>Indywidualne</option>
                 <option>Grupowe</option>
@@ -169,11 +203,14 @@ export default function AddToCalendar() {
           <div>
             <label className="block text-sm text-gray-600 mb-1">Kolor zajęcia</label>
             <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className={`w-3 h-3 rounded-full ${colorMap[formData.color as keyof typeof colorMap]}`}></div>
+              </div>
               <select 
                 name="color"
                 value={formData.color}
                 onChange={handleInputChange}
-                className="w-full h-9 px-2 border border-gray-200 rounded appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full h-9 pl-8 pr-8 border border-gray-200 rounded appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option>Zielony</option>
                 <option>Niebieski</option>
@@ -191,26 +228,22 @@ export default function AddToCalendar() {
         <div className="grid grid-cols-2 gap-2">
           <div>
             <label className="block text-sm text-gray-600 mb-0.5">Data</label>
-            <div className="relative w-full">
+            <div className="relative w-full z-10">
+              <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none z-20">
+                {icons.calendar}
+              </div>
               <DatePicker
                 selected={formData.date}
                 onChange={(date: Date | null) => date && setFormData(prev => ({ ...prev, date }))}
                 dateFormat="EEEE, d MMM yyyy"
                 locale={pl}
                 customInput={
-                  <div className="relative w-full">
-                    <input
-                      type="text"
-                      value={formatDate(formData.date)}
-                      readOnly
-                      className="w-full h-9 px-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer bg-white"
-                    />
-                    <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                  </div>
+                  <input
+                    type="text"
+                    value={formatDate(formData.date)}
+                    readOnly
+                    className="w-full h-9 pl-9 pr-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer bg-white"
+                  />
                 }
                 wrapperClassName="w-full"
               />
@@ -220,45 +253,92 @@ export default function AddToCalendar() {
           <div className="grid grid-cols-2 gap-2">
             <div>
               <label className="block text-sm text-gray-600 mb-0.5">Od</label>
-              <div className="relative">
-                <select 
+              <div className="relative" ref={timeStartRef}>
+                <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                  {icons.time}
+                </div>
+                <input
+                  type="text"
                   name="timeStart"
                   value={formData.timeStart}
-                  onChange={handleInputChange}
-                  className="w-full h-9 px-2 border border-gray-200 rounded appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  onChange={(e) => handleTimeChange(e, 'timeStart')}
+                  placeholder="HH:mm"
+                  className="w-full h-9 pl-9 pr-8 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowTimeStartPicker(!showTimeStartPicker)}
+                  className="absolute inset-y-0 right-0 flex items-center px-2"
                 >
-                  <option value="">Wybierz godzinę</option>
-                  {generateTimeOptions().map(time => (
-                    <option key={time} value={time}>{time}</option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
-                </div>
+                </button>
+                {showTimeStartPicker && (
+                  <div className="absolute mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg z-50">
+                    <div className="max-h-60 overflow-y-auto">
+                      <div className="p-2">
+                        <div className="grid grid-cols-4 gap-1">
+                          {generateTimeOptions().map((time) => (
+                            <button
+                              key={time}
+                              onClick={() => handleTimeSelect(time, 'timeStart')}
+                              className="px-2 py-1 text-sm hover:bg-blue-50 rounded"
+                            >
+                              {time}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
+            {/* Apply the same changes to the "Do" time selector */}
             <div>
               <label className="block text-sm text-gray-600 mb-0.5">Do</label>
-              <div className="relative">
-                <select 
+              <div className="relative" ref={timeEndRef}>
+                <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                  {icons.time}
+                </div>
+                <input
+                  type="text"
                   name="timeEnd"
                   value={formData.timeEnd}
-                  onChange={handleInputChange}
-                  className="w-full h-9 px-2 border border-gray-200 rounded appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  onChange={(e) => handleTimeChange(e, 'timeEnd')}
+                  placeholder="HH:mm"
+                  className="w-full h-9 pl-9 pr-8 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowTimeEndPicker(!showTimeEndPicker)}
+                  className="absolute inset-y-0 right-0 flex items-center px-2"
                 >
-                  <option value="">Wybierz godzinę</option>
-                  {generateTimeOptions().map(time => (
-                    <option key={time} value={time}>{time}</option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
-                </div>
+                </button>
+                {showTimeEndPicker && (
+                  <div className="absolute mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg z-50">
+                    <div className="max-h-60 overflow-y-auto">
+                      <div className="p-2">
+                        <div className="grid grid-cols-4 gap-1">
+                          {generateTimeOptions().map((time) => (
+                            <button
+                              key={time}
+                              onClick={() => handleTimeSelect(time, 'timeEnd')}
+                              className="px-2 py-1 text-sm hover:bg-blue-50 rounded"
+                            >
+                              {time}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -267,11 +347,14 @@ export default function AddToCalendar() {
         <div>
           <label className="block text-sm text-gray-600 mb-0.5">Cykliczność</label>
           <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+              {icons.repeat}
+            </div>
             <select 
               name="frequency"
               value={formData.frequency}
               onChange={handleInputChange}
-              className="w-full h-9 px-2 border border-gray-200 rounded appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full h-9 pl-9 pr-8 border border-gray-200 rounded appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option>Nie powtarza się</option>
               <option>Codziennie</option>
@@ -289,11 +372,14 @@ export default function AddToCalendar() {
         <div>
           <label className="block text-sm text-gray-600 mb-0.5">Pracownik</label>
           <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+              {icons.employee}
+            </div>
             <select 
               name="employee"
               value={formData.employee}
               onChange={handleInputChange}
-              className="w-full h-9 px-2 border border-gray-200 rounded appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full h-9 pl-9 pr-8 border border-gray-200 rounded appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option>Jan Trenerowski</option>
             </select>
@@ -321,6 +407,9 @@ export default function AddToCalendar() {
             ))}
           </div>
           <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+              {icons.clients}
+            </div>
             <input
               type="text"
               name="searchClient"
@@ -328,7 +417,7 @@ export default function AddToCalendar() {
               onChange={handleInputChange}
               onKeyPress={handleKeyPress}
               placeholder="Wyszukaj klienta..."
-              className="w-full h-9 px-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full h-9 pl-9 pr-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             {formData.searchClient && (
               <button

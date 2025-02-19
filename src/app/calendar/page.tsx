@@ -6,7 +6,7 @@ import Calendar from './components/Calendar';
 const CalendarPage: React.FC = () => {
   return (
     <>
-      <main className="min-h-screen p-4 bg-gray-50">
+      <main className="min-h-screen p-4">
         <div className="max-w-7xl mx-auto">
           <p className="text-sm text-gray-600 mb-2">Kalendarze pracowników. Wyświetlaj, dodawaj, edytuj zajęcia.</p>
           <Calendar />

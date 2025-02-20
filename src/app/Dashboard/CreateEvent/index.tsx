@@ -1,15 +1,15 @@
 'use client'
 
 import { useState } from 'react';
-import { FormData } from '../CreateEvent/types';
-import { colorMap } from '../CreateEvent/constants';
-import { useEventForm } from '../CreateEvent/hooks/useEventForm';
+import { FormData } from './types';
+import { colorMap } from './constants';
+import { useEventForm } from './hooks/useEventForm';
 import EventNameField from './components/EventNameField';
-import EventTypeAndColor from '../CreateEvent/components/EventTypeAndColor';
-import FrequencyField from '../CreateEvent/components/FrequencyField';
-import EmployeeField from '../CreateEvent/components/EmployeeField';
-import ClientsField from '../CreateEvent/components/ClientsField';
-import ActionButtons from '../CreateEvent/components/ActionButtons';
+import EventTypeAndColor from './components/EventTypeAndColor';
+import FrequencyField from './components/FrequencyField';
+import EmployeeField from './components/EmployeeField';
+import ClientsField from './components/ClientsField';
+import ActionButtons from './components/ActionButtons';
 import DateSelection from './components/Date';
 import TimeSelection from './components/Time';
 // Remove the DateTimeSelection import
@@ -43,7 +43,7 @@ export default function CreateEvent() {
           colorMap={colorMap}
         />
 
-        <div className="flex flex-col sm:flex-row gap-4 w-full">
+        <div className="flex flex-col sm:flex-row sm:gap-2 gap-4 w-full">
           <DateSelection date={formData.date} setFormData={setFormData} />
           <TimeSelection 
             timeStart={formData.timeStart} 

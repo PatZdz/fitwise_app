@@ -98,7 +98,7 @@ const TimeInput: React.FC<TimeInputProps> = ({ name, value, timeStart, onChange 
 
 export default function TimeSelection({ timeStart, timeEnd, onChange }: TimeSelectionProps) {
   return (
-    <div className="flex-1 min-w-0 flex gap-4">
+    <div className="flex-1 min-w-0 flex gap-2">
       <TimeInput name="timeStart" value={timeStart} timeStart={timeStart} onChange={onChange} />
       <TimeInput name="timeEnd" value={timeEnd} timeStart={timeStart} onChange={onChange} />
     </div>

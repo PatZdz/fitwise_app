@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 import Calendar from '@/app/components/CalendarDashboard/Calendar';
-import CreateEvent from '@/app/components/CreateEvent';
+import CreateEvent from '@/app/components/CreateEvent/index';  // Updated import path
 import Stats from '@/app/components/StatCard';
 
 export default function Home() {

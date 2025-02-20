@@ -6,11 +6,13 @@ import { colorMap } from '../CreateEvent/constants';
 import { useEventForm } from '../CreateEvent/hooks/useEventForm';
 import EventNameField from './components/EventNameField';
 import EventTypeAndColor from '../CreateEvent/components/EventTypeAndColor';
-import DateTimeSelection from '../CreateEvent/components/DateTimeSelection';
 import FrequencyField from '../CreateEvent/components/FrequencyField';
 import EmployeeField from '../CreateEvent/components/EmployeeField';
 import ClientsField from '../CreateEvent/components/ClientsField';
 import ActionButtons from '../CreateEvent/components/ActionButtons';
+import DateSelection from './components/Date';
+import TimeSelection from './components/Time';
+// Remove the DateTimeSelection import
 
 export default function CreateEvent() {
   const {
@@ -21,7 +23,7 @@ export default function CreateEvent() {
     addClient,
     removeClient,
     handleKeyPress,
-    setFormData  // Added missing setFormData
+    setFormData
   } = useEventForm();
 
   return (
@@ -41,13 +43,14 @@ export default function CreateEvent() {
           colorMap={colorMap}
         />
 
-        <DateTimeSelection
-          date={formData.date}
-          timeStart={formData.timeStart}
-          timeEnd={formData.timeEnd}
-          onChange={handleInputChange}
-          setFormData={setFormData}  
-        />
+        <div className="flex flex-col sm:flex-row gap-4 w-full">
+          <DateSelection date={formData.date} setFormData={setFormData} />
+          <TimeSelection 
+            timeStart={formData.timeStart} 
+            timeEnd={formData.timeEnd} 
+            onChange={handleInputChange}
+          />
+        </div>
 
         <FrequencyField
           value={formData.frequency}

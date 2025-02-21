@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { XMarkIcon, UserPlusIcon, TrashIcon, EllipsisVerticalIcon } from '@heroicons/react/24/outline'
+import { format } from 'date-fns'
+import { pl } from 'date-fns/locale'
+import { XMarkIcon, UserPlusIcon, TrashIcon, EllipsisVerticalIcon, CalendarIcon, ClockIcon } from '@heroicons/react/24/outline'
 
 interface Participant {
   name: string
@@ -15,17 +17,36 @@ interface AttendanceModalProps {
   classData: {
     title: string
     time: string
+    startTime?: string
+    endTime?: string
+    date: Date
     trainer: string
     participants: Participant[]
   }
   onUpdateParticipants?: (participants: Participant[]) => void
   onDeleteEvent?: () => void
+  onUpdateDateTime?: (date: Date, time: string) => void
 }
 
-export default function Attendance({ isOpen, onClose, classData, onUpdateParticipants, onDeleteEvent }: AttendanceModalProps) {
+export default function Attendance({ 
+  isOpen, 
+  onClose, 
+  classData, 
+  onUpdateParticipants, 
+  onDeleteEvent,
+  onUpdateDateTime 
+}: AttendanceModalProps) {
   const [participants, setParticipants] = useState(classData.participants)
   const [newParticipant, setNewParticipant] = useState('')
   const [showActions, setShowActions] = useState(false)
+  const [showDateTimePicker, setShowDateTimePicker] = useState(false)
+  const [selectedDate, setSelectedDate] = useState(classData.date)
+  const [selectedStartTime, setSelectedStartTime] = useState(
+    classData.startTime || classData.time.split(' - ')[0]
+  )
+  const [selectedEndTime, setSelectedEndTime] = useState(
+    classData.endTime || classData.time.split(' - ')[1] || format(new Date().setHours(parseInt(classData.time) + 1, 0), 'HH:mm')
+  )
 
   const handleAttendanceChange = (index: number) => {
     const updatedParticipants = participants.map((participant, i) => 
@@ -62,6 +83,11 @@ export default function Attendance({ isOpen, onClose, classData, onUpdatePartici
       onDeleteEvent?.()
       onClose()
     }
+  }
+
+  const handleDateTimeUpdate = () => {
+    onUpdateDateTime?.(selectedDate, `${selectedStartTime} - ${selectedEndTime}`)
+    setShowDateTimePicker(false)
   }
 
   if (!isOpen) return null
@@ -107,16 +133,79 @@ export default function Attendance({ isOpen, onClose, classData, onUpdatePartici
                 </button>
               </div>
             </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="text-sm text-gray-600">{classData.time}</span>
-              </div>
-              <div className="text-sm text-gray-500">
-                Obecnych: {participants.filter(p => p.isPresent).length}/{participants.length}
-              </div>
+            
+            <div className="relative">
+              <button
+                onClick={() => setShowDateTimePicker(!showDateTimePicker)}
+                className="flex items-center gap-3 group hover:bg-gray-50 p-2 rounded-lg transition-colors w-full"
+              >
+                <div className="flex items-center gap-2">
+                  <CalendarIcon className="w-5 h-5 text-gray-400 group-hover:text-blue-500" />
+                  <span className="text-sm text-gray-600 group-hover:text-blue-600">
+                    {format(selectedDate, 'EEEE, d MMMM yyyy', { locale: pl })}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <ClockIcon className="w-5 h-5 text-gray-400 group-hover:text-blue-500" />
+                  <span className="text-sm text-gray-600 group-hover:text-blue-600">
+                    {selectedStartTime} - {selectedEndTime}
+                  </span>
+                </div>
+              </button>
+
+              {showDateTimePicker && (
+                <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-lg shadow-xl border border-gray-100 p-4 z-50">
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Data</label>
+                      <input
+                        type="date"
+                        value={format(selectedDate, 'yyyy-MM-dd')}
+                        onChange={(e) => setSelectedDate(new Date(e.target.value))}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm text-gray-600 mb-1">Godzina rozpoczęcia</label>
+                        <input
+                          type="time"
+                          value={selectedStartTime}
+                          onChange={(e) => setSelectedStartTime(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-600 mb-1">Godzina zakończenia</label>
+                        <input
+                          type="time"
+                          value={selectedEndTime}
+                          onChange={(e) => setSelectedEndTime(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setShowDateTimePicker(false)}
+                        className="flex-1 px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        Anuluj
+                      </button>
+                      <button
+                        onClick={handleDateTimeUpdate}
+                        className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                      >
+                        Zapisz
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-4 text-sm text-gray-500">
+              Obecnych: {participants.filter(p => p.isPresent).length}/{participants.length}
             </div>
           </div>
 

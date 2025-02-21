@@ -2,13 +2,25 @@
 
 import { useState } from 'react';
 import CalendarHeader from './CalendarHeader';
-import { format } from 'date-fns';
+import { format, addHours } from 'date-fns';
 import { pl } from 'date-fns/locale';
 import Attendance from '../Attendance';
 
+interface ClassItem {
+  type: string;
+  time: string;
+  title: string;
+  trainer: string;
+  participants: Array<{
+    name: string;
+    isPresent: boolean;
+    avatar?: string;
+  }>;
+}
+
 export default function Calendar() {
   const [currentDate] = useState(new Date());
-  const [selectedClass, setSelectedClass] = useState<any>(null);
+  const [selectedClass, setSelectedClass] = useState<ClassItem | null>(null);
 
   const classes = [
     {
@@ -65,11 +77,37 @@ export default function Calendar() {
     return classes.filter(classItem => classItem.time === hourStr);
   };
 
-  const handleClassClick = (classItem: any) => {
+  const handleClassClick = (classItem: ClassItem) => {
+    const classDate = new Date(currentDate);
+    const [hours] = classItem.time.split(':').map(Number);
+    classDate.setHours(hours, 0, 0, 0);
+
     setSelectedClass({
       ...classItem,
-      time: `${classItem.time} - ${parseInt(classItem.time) + 1}:00`
+      time: `${classItem.time} - ${format(addHours(classDate, 1), 'HH:mm')}`
     });
+  };
+
+  const handleUpdateParticipants = (updatedParticipants: typeof classes[0]['participants']) => {
+    if (selectedClass) {
+      setSelectedClass({
+        ...selectedClass,
+        participants: updatedParticipants
+      });
+    }
+  };
+
+  const handleUpdateDateTime = (date: Date, time: string) => {
+    if (selectedClass) {
+      setSelectedClass({
+        ...selectedClass,
+        time
+      });
+    }
+  };
+
+  const handleDeleteEvent = () => {
+    setSelectedClass(null);
   };
 
   return (
@@ -123,9 +161,13 @@ export default function Calendar() {
           classData={{
             title: selectedClass.title,
             time: selectedClass.time,
+            date: currentDate,
             trainer: selectedClass.trainer,
             participants: selectedClass.participants
           }}
+          onUpdateParticipants={handleUpdateParticipants}
+          onDeleteEvent={handleDeleteEvent}
+          onUpdateDateTime={handleUpdateDateTime}
         />
       )}
     </>

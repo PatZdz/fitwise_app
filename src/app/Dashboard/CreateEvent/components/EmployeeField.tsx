@@ -1,12 +1,8 @@
-import { InputChangeEvent } from '../types';
+'use client'
+
 import { icons } from '../constants';
 
-interface EmployeeFieldProps {
-  value: string;
-  onChange: (e: InputChangeEvent) => void;
-}
-
-export default function EmployeeField({ value, onChange }: EmployeeFieldProps) {
+export default function EmployeeField() {
   return (
     <div>
       <label className="block text-sm text-gray-600 mb-0.5">Pracownik</label>
@@ -16,11 +12,12 @@ export default function EmployeeField({ value, onChange }: EmployeeFieldProps) {
         </div>
         <select 
           name="employee"
-          value={value}
-          onChange={onChange}
           className="w-full h-9 pl-9 pr-8 border border-gray-200 rounded appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         >
+          <option value="">Wybierz pracownika</option>
           <option>Jan Trenerowski</option>
+          <option>Anna Kowalska</option>
+          <option>Piotr Nowak</option>
         </select>
         <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
           <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

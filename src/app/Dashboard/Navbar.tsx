@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const pathname = usePathname();
 
   // Add handler for clicking outside drawer
@@ -25,35 +25,100 @@ export default function Navbar() {
       }
     };
 
+    // Add scroll locking
+    if (isDrawerOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      // Ensure scroll is restored when component unmounts
+      document.body.style.overflow = 'auto';
+    };
   }, [isDrawerOpen]);
 
-  const toggleDrawer = () => {
-    setIsSearchOpen(false);
-    setIsDrawerOpen(!isDrawerOpen);
-  };
-
-  const toggleSearch = () => {
-    setIsDrawerOpen(false);
-    setIsSearchOpen(!isSearchOpen);
-  };
-
+  // Add handler for clicking outside profile menu
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const searchContainer = document.getElementById('search-container');
-      if (searchContainer && !searchContainer.contains(event.target as Node)) {
-        setIsSearchOpen(false);
+      const profileMenu = document.getElementById('profile-menu');
+      const profileButton = document.getElementById('profile-button');
+      
+      if (isProfileOpen && 
+          profileMenu && 
+          profileButton && 
+          !profileMenu.contains(event.target as Node) && 
+          !profileButton.contains(event.target as Node)) {
+        setIsProfileOpen(false);
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [isProfileOpen]);
+
+  const toggleDrawer = () => {
+    setIsDrawerOpen(!isDrawerOpen);
+  };
+
+  const toggleProfile = () => {
+    setIsProfileOpen(!isProfileOpen);
+  };
+
+  const ProfileMenu = () => (
+    <div className="bg-white rounded-lg shadow-lg border border-gray-200 w-72">
+      <div className="p-4 border-b border-gray-200">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-full bg-gray-800 text-white flex items-center justify-center text-lg font-medium">
+            BJ
+          </div>
+          <div>
+            <h3 className="font-medium text-gray-900">Bartosz Janosz</h3>
+            <p className="text-sm text-gray-500">bart.janosz@gmail.com</p>
+            <p className="text-sm text-gray-500">(admin)</p>
+          </div>
+        </div>
+      </div>
+      <div className="p-2">
+        <Link 
+          href="/profile" 
+          className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50"
+          onClick={() => setIsProfileOpen(false)}
+        >
+          <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          Mój profil
+        </Link>
+        <Link 
+          href="/settings" 
+          className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50"
+          onClick={() => setIsProfileOpen(false)}
+        >
+          <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          Ustawienia
+        </Link>
+        <button 
+          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50"
+          onClick={() => setIsProfileOpen(false)}
+        >
+          <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          Wyloguj
+        </button>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="w-full bg-white shadow-sm">
-      <nav className="flex items-center justify-between p-4 max-w-[1280px] mx-auto">
+    <div className="fixed top-0 left-0 right-0 bg-white shadow-sm z-40 h-16">
+      <nav className="flex items-center justify-between h-full p-4 max-w-[1280px] mx-auto">
         <div className="flex items-center gap-8">
           {/* Logo */}
           <Link href="/" className="flex items-center">
@@ -111,7 +176,7 @@ export default function Navbar() {
             </Link>
             
             <Link 
-              href="/employees" 
+              href="/workers" 
               className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors
                 ${pathname === '/employees' 
                   ? 'bg-blue-50 text-blue-600' 
@@ -128,43 +193,26 @@ export default function Navbar() {
 
         {/* Right side icons */}
         <div className="flex items-center gap-4">
-          <div className="relative" id="search-container">
-            <button 
-              className={`hidden md:block p-2 rounded-full transition-colors ${
-                isSearchOpen ? 'bg-gray-100' : 'hover:bg-gray-100'
-              }`}
-              onClick={toggleSearch}
-            >
-              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </button>
-            
-            {isSearchOpen && (
-              <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-lg shadow-lg p-4 border border-gray-200">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Szukaj..."
-                    className="w-full h-10 pl-10 pr-4 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    autoFocus
-                  />
-                  <svg className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-              </div>
-            )}
-          </div>
-
           <button className="hidden md:block p-2 hover:bg-gray-100 rounded-full">
             <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
           </button>
 
-          <button className="hidden md:block w-8 h-8 rounded-full bg-gray-800 text-white flex items-center justify-center font-medium">
+          <button 
+            id="profile-button"
+            className="hidden md:flex w-8 h-8 rounded-full bg-gray-800 text-white items-center justify-center font-medium relative"
+            onClick={toggleProfile}
+          >
             BJ
+            {isProfileOpen && (
+              <div 
+                id="profile-menu"
+                className="absolute right-0 top-full mt-2 z-50"
+              >
+                <ProfileMenu />
+              </div>
+            )}
           </button>
           
           <button 
@@ -180,13 +228,19 @@ export default function Navbar() {
           {/* Mobile Drawer */}
           <div 
             id="mobile-drawer"
-            className={`fixed inset-y-0 right-0 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${isDrawerOpen ? 'translate-x-0' : 'translate-x-full'} md:hidden`}
+            className={`fixed inset-y-0 right-0 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-50 ${isDrawerOpen ? 'translate-x-0' : 'translate-x-full'} md:hidden`}
           >
             <div className="p-4">
               <div className="flex justify-between items-center mb-6">
-                <button className="w-8 h-8 rounded-full bg-gray-800 text-white flex items-center justify-center font-medium">
-                  BJ
-                </button>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-gray-800 text-white flex items-center justify-center font-medium">
+                    BJ
+                  </div>
+                  <div className="text-sm">
+                    <p className="font-medium text-gray-900">Bartosz Janosz</p>
+                    <p className="text-gray-500">admin</p>
+                  </div>
+                </div>
                 <button 
                   className="p-2 hover:bg-gray-100 rounded-full"
                   onClick={toggleDrawer}
@@ -196,6 +250,8 @@ export default function Navbar() {
                   </svg>
                 </button>
               </div>
+
+              {/* Navigation Links */}
               <div className="flex flex-col gap-4">
                 <Link 
                   href="/" 
@@ -243,7 +299,7 @@ export default function Navbar() {
                 </Link>
                 
                 <Link 
-                  href="/employees" 
+                  href="/workers" 
                   className={`flex items-center gap-2 p-2 rounded-lg transition-colors
                     ${pathname === '/employees' 
                       ? 'bg-blue-50 text-blue-600' 
@@ -256,6 +312,39 @@ export default function Navbar() {
                   </svg>
                   <span>Pracownicy</span>
                 </Link>
+
+                <div className="border-t border-gray-200 mt-4 pt-4">
+                  <Link 
+                    href="/profile" 
+                    className="flex items-center gap-2 p-2 rounded-lg text-gray-600 hover:bg-gray-50"
+                    onClick={toggleDrawer}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    Mój profil
+                  </Link>
+                  <Link 
+                    href="/settings" 
+                    className="flex items-center gap-2 p-2 rounded-lg text-gray-600 hover:bg-gray-50"
+                    onClick={toggleDrawer}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Ustawienia
+                  </Link>
+                  <button 
+                    className="w-full flex items-center gap-2 p-2 rounded-lg text-gray-600 hover:bg-gray-50"
+                    onClick={toggleDrawer}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Wyloguj
+                  </button>
+                </div>
               </div>
             </div>
           </div>

@@ -1,12 +1,8 @@
-import { InputChangeEvent } from '../types';
+'use client'
+
 import { icons } from '../constants';
 
-interface EventNameFieldProps {
-  value: string;
-  onChange: (e: InputChangeEvent) => void;
-}
-
-export default function EventNameField({ value, onChange }: EventNameFieldProps) {
+export default function EventNameField() {
   return (
     <div>
       <label className="block text-sm text-gray-600 mb-0.5">Nazwa zajęcia</label>
@@ -17,8 +13,7 @@ export default function EventNameField({ value, onChange }: EventNameFieldProps)
         <input
           type="text"
           name="name"
-          value={value}
-          onChange={onChange}
+          placeholder="Wprowadź nazwę zajęcia"
           className="w-full h-9 pl-9 pr-2 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>

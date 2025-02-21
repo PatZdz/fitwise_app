@@ -2,117 +2,132 @@
 
 import { useState } from 'react';
 import CalendarHeader from './CalendarHeader';
-import { CalendarClass as ICalendarClass } from './types/types';
 import { format } from 'date-fns';
 import { pl } from 'date-fns/locale';
+import Attendance from '../Attendance';
 
 export default function Calendar() {
   const [currentDate] = useState(new Date());
+  const [selectedClass, setSelectedClass] = useState<any>(null);
 
-  const classes: ICalendarClass[] = [
+  const classes = [
     {
       type: 'POMOC',
       time: '8:00',
       title: 'Crossfit',
       trainer: 'Jan Paterski',
-      participants: 11
+      participants: [
+        { name: "Adam Nowak", isPresent: false },
+        { name: "Michał Temeryn", isPresent: false },
+        { name: "Grzegorz Rataj", isPresent: false },
+        { name: "Sławomir Kowalski", isPresent: false }
+      ]
     },
     {
       type: 'POMOC',
       time: '9:00',
       title: 'Zumba',
       trainer: 'Iza Golińska',
-      participants: 14
+      participants: [
+        { name: "Joanna Bigdaj", isPresent: false },
+        { name: "Anna Kowalska", isPresent: false },
+        { name: "Maria Nowak", isPresent: false }
+      ]
     },
     {
       type: 'DZIŚ',
       time: '10:00',
       title: 'Trening personalny',
       trainer: 'Krzysztof Kolin',
-      participants: 1
+      participants: [
+        { name: "Jan Ślusarz", isPresent: false }
+      ]
     },
     {
       type: 'DZIŚ',
-      time: '12:00',
+      time: '14:00',
       title: 'Trening siłowy',
-      trainer: 'Iza Golińska',
-      participants: 4
-    },
-    {
-      type: 'DZIŚ',
-      time: '13:00',
-      title: 'Trening kardio',
-      trainer: 'Jan Paterski',
-      participants: 8
-    },
-    {
-      type: 'DZIŚ',
-      time: '17:00',
-      title: 'Trening dla początkujących',
-      trainer: 'Jan Paterski',
-      participants: 20
+      trainer: 'Andrzej Pęk',
+      participants: [
+        { name: "Patryk Zdołowski", isPresent: false },
+        { name: "Gabriel Granewski", isPresent: false },
+        { name: "Daniel Krosno", isPresent: false }
+      ]
     }
   ];
 
-  // Generowanie tablicy godzin tylko dla istniejących zajęć
-  const timeSlots = Array.from(
-    new Set(classes.map(classItem => parseInt(classItem.time.split(':')[0])))
-  ).sort((a, b) => a - b);
-
-  const handlePrevious = () => {
-    // Implementacja zmiany dnia wstecz
-  };
-
-  const handleNext = () => {
-    // Implementacja zmiany dnia do przodu
-  };
+  const activeHours = [...new Set(classes.map(classItem => 
+    parseInt(classItem.time.split(':')[0])
+  ))].sort((a, b) => a - b);
 
   const getClassesForHour = (hour: number) => {
     const hourStr = `${hour}:00`;
     return classes.filter(classItem => classItem.time === hourStr);
   };
 
-  return (
-    <div className="bg-white rounded-lg shadow-sm p-6">
-      <CalendarHeader 
-        title={format(currentDate, "EEEE, d MMMM yyyy", { locale: pl })}
-        onPrevious={handlePrevious}
-        onNext={handleNext}
-      />
+  const handleClassClick = (classItem: any) => {
+    setSelectedClass({
+      ...classItem,
+      time: `${classItem.time} - ${parseInt(classItem.time) + 1}:00`
+    });
+  };
 
-      <div className="grid grid-cols-[80px_1fr] mt-4">
-        {timeSlots.map((hour) => (
-          <div key={hour} className="contents">
-            <div className="border-r border-b p-2 text-sm text-gray-500 bg-gray-50">
-              {`${hour}:00`}
-            </div>
-            <div className="border-b p-2 min-h-[80px] relative">
-              {getClassesForHour(hour).map((classItem, index) => (
-                <div
-                  key={index}
-                  className="absolute inset-x-1 p-2 rounded bg-blue-50 hover:bg-blue-100 transition-colors"
-                >
-                  <div className="flex justify-between items-start gap-4">
-                    <div>
-                      <div className="text-base font-medium">{classItem.title}</div>
-                      <div className="text-sm text-gray-600">{classItem.trainer}</div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-500">Uczestnicy:</span>
-                      <span className="text-base font-medium">{classItem.participants}</span>
-                      <button className="p-1 hover:bg-blue-200 rounded-full">
-                        <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                        </svg>
-                      </button>
+  return (
+    <>
+      <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 pb-7">
+        <CalendarHeader 
+          title={format(currentDate, "EEEE, d MMMM yyyy", { locale: pl })}
+          onPrevious={() => {}}
+          onNext={() => {}}
+        />
+        <div className="grid grid-cols-[60px_1fr] sm:grid-cols-[80px_1fr] mt-4 auto-rows-[80px] sm:auto-rows-[72px]">
+          {activeHours.map((hour) => (
+            <div key={hour} className="contents">
+              <div className="border-r border-b p-1 sm:p-2 text-sm sm:text-sm text-gray-500 bg-gray-50 flex items-center justify-center">
+                {`${hour}:00`}
+              </div>
+              <div className="border-b p-1 sm:p-2 relative">
+                {getClassesForHour(hour).map((classItem, index) => (
+                  <div
+                    key={index}
+                    onClick={() => handleClassClick(classItem)}
+                    className="absolute inset-x-1 inset-y-1 p-2 sm:p-2 rounded bg-blue-50 hover:bg-blue-100 transition-colors overflow-hidden cursor-pointer"
+                  >
+                    <div className="flex justify-between items-start gap-2 sm:gap-4 h-full">
+                      <div className="min-w-0 flex-1">
+                        <div className="text-base font-medium truncate">{classItem.title}</div>
+                        <div className="text-sm text-gray-600 truncate">{classItem.trainer}</div>
+                      </div>
+                      <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+                        <span className="text-xs sm:text-sm text-gray-500">Uczestnicy:</span>
+                        <span className="text-base font-medium">{classItem.participants.length}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+          {classes.length === 0 && (
+            <div className="absolute inset-0 flex items-center justify-center col-span-2">
+              <p className="text-gray-500 text-lg">Brak zajęć w tym dniu</p>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+
+      {selectedClass && (
+        <Attendance
+          isOpen={!!selectedClass}
+          onClose={() => setSelectedClass(null)}
+          classData={{
+            title: selectedClass.title,
+            time: selectedClass.time,
+            trainer: selectedClass.trainer,
+            participants: selectedClass.participants
+          }}
+        />
+      )}
+    </>
   );
 }

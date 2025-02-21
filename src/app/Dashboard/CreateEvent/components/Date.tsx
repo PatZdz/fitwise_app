@@ -1,16 +1,14 @@
+'use client'
+
 import React from 'react';
 import DatePicker from 'react-datepicker';
 import { pl } from 'date-fns/locale';
-import { FormData } from '../types';
 import { icons } from '../constants';
 import 'react-datepicker/dist/react-datepicker.css';
 
-interface DateSelectionProps {
-  date: Date;
-  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
-}
+export default function DateSelection() {
+  const [selectedDate, setSelectedDate] = React.useState(new Date());
 
-export default function DateSelection({ date, setFormData }: DateSelectionProps) {
   return (
     <div className="flex-1 min-w-0 w-full">
       <label className="block text-sm text-gray-600 mb-0.5">Data</label>
@@ -24,8 +22,8 @@ export default function DateSelection({ date, setFormData }: DateSelectionProps)
           </svg>
         </div>
         <DatePicker
-          selected={date}
-          onChange={(date: Date | null) => date && setFormData(prev => ({ ...prev, date }))}
+          selected={selectedDate}
+          onChange={(date: Date | null) => date && setSelectedDate(date)}
           dateFormat="EEEE, d MMM yyyy"
           locale={pl}
           className="w-full h-9 pl-9 pr-8 border border-gray-200 rounded appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"

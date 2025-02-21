@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { XMarkIcon, UserPlusIcon, TrashIcon } from '@heroicons/react/24/outline'
+import { XMarkIcon, UserPlusIcon, TrashIcon, EllipsisVerticalIcon } from '@heroicons/react/24/outline'
 
 interface Participant {
   name: string
@@ -19,11 +19,13 @@ interface AttendanceModalProps {
     participants: Participant[]
   }
   onUpdateParticipants?: (participants: Participant[]) => void
+  onDeleteEvent?: () => void
 }
 
-export default function Attendance({ isOpen, onClose, classData, onUpdateParticipants }: AttendanceModalProps) {
+export default function Attendance({ isOpen, onClose, classData, onUpdateParticipants, onDeleteEvent }: AttendanceModalProps) {
   const [participants, setParticipants] = useState(classData.participants)
   const [newParticipant, setNewParticipant] = useState('')
+  const [showActions, setShowActions] = useState(false)
 
   const handleAttendanceChange = (index: number) => {
     const updatedParticipants = participants.map((participant, i) => 
@@ -54,6 +56,14 @@ export default function Attendance({ isOpen, onClose, classData, onUpdatePartici
     }
   }
 
+  const handleDeleteEvent = () => {
+    const confirmed = window.confirm('Czy na pewno chcesz usunąć te zajęcia? Ta operacja jest nieodwracalna.')
+    if (confirmed) {
+      onDeleteEvent?.()
+      onClose()
+    }
+  }
+
   if (!isOpen) return null
 
   return (
@@ -68,12 +78,34 @@ export default function Attendance({ isOpen, onClose, classData, onUpdatePartici
                 <h2 className="text-xl font-semibold text-gray-900">{classData.title}</h2>
                 <p className="text-blue-600 mt-1">{classData.trainer}</p>
               </div>
-              <button 
-                onClick={onClose}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <XMarkIcon className="w-5 h-5 text-gray-500" />
-              </button>
+              <div className="flex items-center gap-1">
+                <div className="relative">
+                  <button
+                    onClick={() => setShowActions(!showActions)}
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  >
+                    <EllipsisVerticalIcon className="w-5 h-5 text-gray-500" />
+                  </button>
+                  
+                  {showActions && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-1">
+                      <button
+                        onClick={handleDeleteEvent}
+                        className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                      >
+                        <TrashIcon className="w-4 h-4" />
+                        Usuń zajęcia
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <button 
+                  onClick={onClose}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <XMarkIcon className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
